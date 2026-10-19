@@ -304,14 +304,21 @@
   }
 
   // keep sheets above the iOS keyboard
+  // The sheet layer always fills the screen (CSS inset: 0). Only while the keyboard is up do we
+  // lift sheets by the keyboard's height; at launch iOS can report a stale visualViewport height.
   const vv = window.visualViewport;
   function vvUpdate() {
-    const h = vv ? vv.height : window.innerHeight;
-    document.documentElement.style.setProperty('--vvh', h + 'px');
-    layer.style.transform = vv ? `translateY(${vv.offsetTop}px)` : '';
+    let kb = 0;
+    const f = document.activeElement;
+    if (vv && f && f.matches && f.matches('input, textarea')) kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+    if (kb < 80) kb = 0;
+    document.documentElement.style.setProperty('--kb', kb + 'px');
   }
   if (vv) { vv.addEventListener('resize', vvUpdate); vv.addEventListener('scroll', vvUpdate); }
-  window.addEventListener('resize', vvUpdate); vvUpdate();
+  window.addEventListener('resize', vvUpdate);
+  document.addEventListener('focusin', () => setTimeout(vvUpdate, 50));
+  document.addEventListener('focusout', () => setTimeout(vvUpdate, 50));
+  vvUpdate();
   // scroll a focused field into view inside its sheet once the keyboard is up
   layer.addEventListener('focusin', e => {
     if (e.target.matches('input, textarea')) setTimeout(() => e.target.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 320);

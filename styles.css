@@ -204,18 +204,18 @@ body.banner .fab { bottom: calc(100px + var(--sb)); }
 body.banner .toasts { bottom: calc(172px + var(--sb)); }
 
 /* ---------- sheets ---------- */
-.sheets { position: fixed; z-index: 100; left: 0; right: 0; top: 0; height: var(--vvh, 100%); pointer-events: none; }
+.sheets { position: fixed; z-index: 100; inset: 0; pointer-events: none; }
 .sheets .backdrop { position: absolute; inset: 0; background: rgba(8, 6, 18, .42); opacity: 0; transition: opacity .3s; }
 .sheets.open { pointer-events: auto; }
 .sheets.open .backdrop { opacity: 1; }
 .sheet {
-  position: absolute; left: 0; right: 0; bottom: 0; margin: 0 auto; max-width: 640px;
-  max-height: calc(var(--vvh, 100vh) - var(--st) - 14px);
+  position: absolute; left: 0; right: 0; bottom: var(--kb, 0px); margin: 0 auto; max-width: 640px;
+  max-height: calc(100% - var(--st) - 14px - var(--kb, 0px));
   display: flex; flex-direction: column;
   background: var(--bg); border-radius: 22px 22px 0 0; box-shadow: var(--shadow-lg);
-  transform: translateY(105%); transition: transform .38s cubic-bezier(.2, .9, .25, 1), filter .3s, scale .3s;
+  transform: translateY(105%); transition: transform .38s cubic-bezier(.2, .9, .25, 1), filter .3s, scale .3s, bottom .25s, max-height .25s, height .25s;
 }
-.sheet.tall { height: calc(var(--vvh, 100vh) - var(--st) - 14px); }
+.sheet.tall { height: calc(100% - var(--st) - 14px - var(--kb, 0px)); }
 .sheet.in { transform: translateY(0); }
 .sheet.behind { scale: .94; filter: brightness(.85); transform-origin: top center; }
 .sheet .grab { width: 38px; height: 5px; border-radius: 3px; background: var(--surface-3); margin: 8px auto 0; flex: none; }
