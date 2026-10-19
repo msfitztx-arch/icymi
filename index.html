@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>ICYMI</title>
+  <meta name="description" content="ICYMI — a beautiful, offline bookmark keeper.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="ICYMI">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="theme-color" content="#f5f4f9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0e0d13" media="(prefers-color-scheme: dark)">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="icons/favicon.png">
+  <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <header class="top" id="top">
+      <div class="title-row">
+        <h1 class="brand">ICYMI</h1>
+        <div class="hbtns">
+          <button class="hbtn" id="editBtn" aria-label="Edit mode"><i class="fa-solid fa-pen"></i></button>
+          <button class="hbtn" id="viewBtn" aria-label="View options"><i class="fa-solid fa-sliders"></i></button>
+          <button class="hbtn" id="setBtn" aria-label="Settings"><i class="fa-solid fa-gear"></i></button>
+        </div>
+      </div>
+      <label class="search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input id="q" type="search" placeholder="Search bookmarks, tags, notes" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
+        <button class="clear" id="qClear" aria-label="Clear search"><i class="fa-solid fa-circle-xmark"></i></button>
+      </label>
+      <nav class="chips scroll" id="chips"></nav>
+      <div class="tagbar" id="tagbar"></div>
+    </header>
+
+    <div class="editbar" id="editbar">
+      <span><i class="fa-solid fa-hand-pointer"></i> Tap to edit · hold &amp; drag to reorder</span>
+      <button id="editDone">Done</button>
+    </div>
+
+    <main id="list" class="list"></main>
+    <div id="empty" class="empty" hidden></div>
+  </div>
+
+  <button class="fab" id="addBtn" aria-label="Add bookmark"><i class="fa-solid fa-plus"></i></button>
+
+  <div id="sheets" class="sheets"><div class="backdrop"></div></div>
+  <div id="toasts" class="toasts"></div>
+
+  <script src="vendor/Sortable.min.js"></script>
+  <script src="icons.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
