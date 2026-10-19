@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opening…</title>
+<style>
+  body { margin: 0; height: 100vh; display: grid; place-items: center; font: 15px -apple-system, system-ui, sans-serif; color: #6f6b7d; background: #f5f4f9; }
+  @media (prefers-color-scheme: dark) { body { background: #0e0d13; color: #a29db2; } }
+</style>
+</head>
+<body>
+Opening…
+<script>
+/* ICYMI link hand-off. Bookmarks open here first, then navigate to the real link.
+   If iOS hands the link to an app (YouTube, Instagram, …) the navigation never
+   happens and this page is still showing — so close it once the user comes back
+   instead of leaving a blank browser behind. */
+(function () {
+  var u = new URLSearchParams(location.search).get('u') || '';
+  function done() { try { window.close(); } catch (e) {} }
+  if (!u || /^(javascript|data|vbscript|file):/i.test(u)) { done(); return; }
+  var left = false;
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) left = true;
+    else if (left) done();
+  });
+  window.addEventListener('pageshow', function (e) { if (e.persisted) done(); });
+  location.replace(u);
+})();
+</script>
+</body>
+</html>

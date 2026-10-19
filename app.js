@@ -189,12 +189,14 @@
     if (sortable) { sortable.destroy(); sortable = null; }
     if (canSort && arr.length > 1) {
       sortable = Sortable.create(list, {
-        animation: 220, easing: 'cubic-bezier(.2,.9,.3,1)',
+        animation: 280, easing: 'cubic-bezier(.25, 1, .5, 1)',
         delay: 260, delayOnTouchOnly: true, touchStartThreshold: 6,
         forceFallback: true, fallbackOnBody: true, fallbackTolerance: 4,
-        ghostClass: 'ghost', chosenClass: 'chosen', filter: '.more', preventOnFilter: false,
-        onStart: () => { dragging = true; },
+        swapThreshold: .6, scroll: true, scrollSensitivity: 90, scrollSpeed: 14, bubbleScroll: true,
+        ghostClass: 'ghost', chosenClass: 'chosen', dragClass: 'drag-clone', filter: '.more', preventOnFilter: false,
+        onStart: () => { dragging = true; document.body.classList.add('dragging'); },
         onEnd: () => {
+          document.body.classList.remove('dragging');
           setTimeout(() => { dragging = false; }, 60);
           reorderBookmarks($$('[data-id]', list).map(el => el.dataset.id));
         },
@@ -223,7 +225,8 @@
     if (e.target.closest('.more') || view.edit) { editBookmark(b.id); return; }
     openLink(b.url);
   });
-  function openLink(url) { window.open(url, '_blank', 'noopener'); }
+  // Links go through open.html, which closes itself if iOS hands the link to an app.
+  function openLink(url) { window.open('open.html?u=' + encodeURIComponent(url), '_blank', 'noopener'); }
 
   $('#chips').addEventListener('click', e => {
     const c = e.target.closest('.chip'); if (!c) return;

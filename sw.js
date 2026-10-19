@@ -1,8 +1,8 @@
 /* ICYMI service worker — offline app shell + favicon cache */
-const VERSION = 'icymi-v3';
+const VERSION = 'icymi-v4';
 const FAV = 'icymi-favicons';
 const SHELL = [
-  './', 'index.html', 'styles.css', 'app.js', 'icons.js', 'manifest.webmanifest',
+  './', 'index.html', 'open.html', 'styles.css', 'app.js', 'icons.js', 'manifest.webmanifest',
   'vendor/Sortable.min.js', 'vendor/fontawesome/css/all.min.css',
   'vendor/fontawesome/webfonts/fa-solid-900.woff2', 'vendor/fontawesome/webfonts/fa-regular-400.woff2',
   'vendor/fontawesome/webfonts/fa-brands-400.woff2', 'vendor/fontawesome/webfonts/fa-v4compatibility.woff2',
