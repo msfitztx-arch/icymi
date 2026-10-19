@@ -127,7 +127,8 @@
     });
     if (state.settings.sort === 'new') arr = arr.slice().sort((a, b) => b.created - a.created);
     else if (state.settings.sort === 'az') arr = arr.slice().sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' }));
-    return arr;
+    // favorites always come first, keeping their order within each group
+    return arr.filter(b => b.fav).concat(arr.filter(b => !b.fav));
   }
 
   function render() {
@@ -163,10 +164,10 @@
     const list = $('#list'), arr = visible(), grid = state.settings.layout === 'grid';
     list.className = 'list' + (grid ? ' grid' : '');
     list.innerHTML = arr.map(b => {
-      if (grid) return `<div class="gitem" data-id="${esc(b.id)}">${tileHTML(b)}<div class="gt">${esc(b.title)}</div><span class="badge"><i class="fa-solid fa-pen"></i></span>${b.fav ? '<i class="fa-solid fa-star gstar"></i>' : ''}</div>`;
+      if (grid) return `<div class="gitem" data-id="${esc(b.id)}" data-fav="${b.fav ? 1 : 0}">${tileHTML(b)}<div class="gt">${esc(b.title)}</div><span class="badge"><i class="fa-solid fa-pen"></i></span>${b.fav ? '<i class="fa-solid fa-star gstar"></i>' : ''}</div>`;
       const c = catById(b.cat);
       const showCat = c && state.ui.filter !== c.id;
-      return `<div class="item" data-id="${esc(b.id)}">${tileHTML(b)}
+      return `<div class="item" data-id="${esc(b.id)}" data-fav="${b.fav ? 1 : 0}">${tileHTML(b)}
         <div class="meta">
           <div class="t"><span>${esc(b.title)}</span>${b.fav ? '<i class="fa-solid fa-star star"></i>' : ''}</div>
           <div class="sub"><span class="dom">${esc(hostOf(b.url) || b.url)}</span>${showCat ? `<span>·</span><span class="cpill" style="--c:${esc(c.color)}">${fa(c.icon)}${esc(c.name)}</span>` : ''}</div>
@@ -194,6 +195,8 @@
         forceFallback: true, fallbackOnBody: true, fallbackTolerance: 4,
         swapThreshold: .6, scroll: true, scrollSensitivity: 90, scrollSpeed: 14, bubbleScroll: true,
         ghostClass: 'ghost', chosenClass: 'chosen', dragClass: 'drag-clone', filter: '.more', preventOnFilter: false,
+        // keep favorites and non-favorites in their own groups while dragging
+        onMove: e => e.dragged.dataset.fav === e.related.dataset.fav,
         onStart: () => { dragging = true; document.body.classList.add('dragging'); },
         onEnd: () => {
           document.body.classList.remove('dragging');
