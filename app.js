@@ -268,6 +268,7 @@
     el.setAttribute('role', 'dialog');
     el.innerHTML = `<div class="grab"></div><header class="sh-head">${left ?? '<button class="txt" data-close>Cancel</button>'}<h2>${esc(title)}</h2>${right ?? '<span></span>'}</header><div class="sh-body">${body}</div>`;
     stack.forEach(s => s.el.classList.add('behind'));
+    if (!stack.length) lockScroll(true);
     layer.appendChild(el); layer.classList.add('open'); document.documentElement.classList.add('sheet-open');
     const api = { el, body: $('.sh-body', el), onClose, close: () => closeSheet(api) };
     stack.push(api);
@@ -284,7 +285,7 @@
     api.el.classList.remove('in'); api.el.style.transform = '';
     setTimeout(() => api.el.remove(), 420);
     if (stack.length) stack[stack.length - 1].el.classList.remove('behind');
-    else { layer.classList.remove('open'); document.documentElement.classList.remove('sheet-open'); }
+    else { layer.classList.remove('open'); document.documentElement.classList.remove('sheet-open'); lockScroll(false); }
     api.onClose && api.onClose();
   }
   $('.backdrop', layer).addEventListener('click', () => stack.length && stack[stack.length - 1].close());
@@ -303,25 +304,47 @@
     });
   }
 
-  // keep sheets above the iOS keyboard
-  // The sheet layer always fills the screen (CSS inset: 0). Only while the keyboard is up do we
-  // lift sheets by the keyboard's height; at launch iOS can report a stale visualViewport height.
+  // Freeze the page behind open sheets so iOS can't scroll it instead of the sheet.
+  let lockedY = 0;
+  function lockScroll(on) {
+    const b = document.body.style;
+    if (on) {
+      lockedY = window.scrollY;
+      Object.assign(b, { position: 'fixed', top: -lockedY + 'px', left: '0', right: '0', width: '100%' });
+    } else {
+      Object.assign(b, { position: '', top: '', left: '', right: '', width: '' });
+      window.scrollTo(0, lockedY);
+    }
+  }
+
+  // The sheet layer fills the screen (CSS inset: 0). While the iOS keyboard is up, pin it to the
+  // visible area: follow the visual viewport's offset and lift sheets by the keyboard's height.
   const vv = window.visualViewport;
   function vvUpdate() {
-    let kb = 0;
+    let kb = 0, off = 0;
     const f = document.activeElement;
-    if (vv && f && f.matches && f.matches('input, textarea')) kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-    if (kb < 80) kb = 0;
+    if (vv && f && f.matches && f.matches('input, textarea')) {
+      kb = Math.max(0, window.innerHeight - vv.height);
+      off = vv.offsetTop;
+    }
+    if (kb < 80) kb = off = 0;
     document.documentElement.style.setProperty('--kb', kb + 'px');
+    layer.style.transform = off ? `translateY(${off}px)` : '';
   }
   if (vv) { vv.addEventListener('resize', vvUpdate); vv.addEventListener('scroll', vvUpdate); }
   window.addEventListener('resize', vvUpdate);
   document.addEventListener('focusin', () => setTimeout(vvUpdate, 50));
   document.addEventListener('focusout', () => setTimeout(vvUpdate, 50));
   vvUpdate();
-  // scroll a focused field into view inside its sheet once the keyboard is up
+  // once the keyboard is up, scroll a focused field into view inside its sheet (never the page)
   layer.addEventListener('focusin', e => {
-    if (e.target.matches('input, textarea')) setTimeout(() => e.target.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 320);
+    if (!e.target.matches('input, textarea')) return;
+    setTimeout(() => {
+      const body = e.target.closest('.sh-body'); if (!body) return;
+      const r = e.target.getBoundingClientRect(), br = body.getBoundingClientRect();
+      if (r.bottom > br.bottom - 12) body.scrollBy({ top: r.bottom - br.bottom + 24, behavior: 'smooth' });
+      else if (r.top < br.top + 12) body.scrollBy({ top: r.top - br.top - 24, behavior: 'smooth' });
+    }, 320);
   });
 
   function confirmSheet({ title, message, ok = 'Delete', danger = true }) {

@@ -1,5 +1,5 @@
 /* ICYMI service worker — offline app shell + favicon cache */
-const VERSION = 'icymi-v2';
+const VERSION = 'icymi-v3';
 const FAV = 'icymi-favicons';
 const SHELL = [
   './', 'index.html', 'styles.css', 'app.js', 'icons.js', 'manifest.webmanifest',
